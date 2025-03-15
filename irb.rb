@@ -1,26 +1,23 @@
-slot-machine irb
-[1] pry(main)> require_relative './slot_machine'
-=> true
-[2] pry(main)> slot = SlotMachine.new
-=> #<SlotMachine:0x00007f46ead77d40 @reels=[]>
-[3] pry(main)> slot.play
-=> ["bell", "seven", "seven"]
-[4] pry(main)> slot.score
-=> 0
-[5] pry(main)> slot.play
-=> ["seven", "bell", "cherry"]
-[6] pry(main)> slot.score
-=> 0
-[7] pry(main)> slot.play
-=> ["star", "joker", "cherry"]
-[8] pry(main)> slot.score
-=> 0
-[9] pry(main)> slot.play
-=> ["cherry", "star", "star"]
-[10] pry(main)> slot.score
-=> 0
-[11] pry(main)> slot.play
-=> ["seven", "seven", "star"]
-[12] pry(main)> slot.score
-=> 0
+#what you code test should look in the terminal
 
+
+➜  slot-machine✗ irb
+[1] pry> require_relative "./slot_machine"
+=> true
+[2] pry> slot = SlotMachine.new
+=> #<SlotMachine:0x00007f78553987b0 @reels=["seven", "cherry", "seven"]>
+[3] pry> slot.score
+=> 0
+[4] pry> slot.play
+=> ["star", "seven", "cherry"]
+[5] pry> slot.score
+=> 0
+[6] pry> slot.play
+=> ["bell", "joker", "seven"]
+[7] pry> slot.score
+=> 0
+[8] pry> slot.play
+=> ["star", "star", "star"]
+[9] pry> slot.score
+=> 40
+[10] pry>

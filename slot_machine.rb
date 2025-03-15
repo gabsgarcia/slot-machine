@@ -1,16 +1,15 @@
 # SlotMachine class simulates a 3-reel slot machine game
 # Each reel can display one of 5 different symbols
 # The score is calculated based on specific combinations
-
 class SlotMachine
-
   # Constants define the possible items and their score values
   # Using constants makes the code more maintainable - if we want to add new symbols
   # or change scores, we only need to modify these constants
+
+  # list of all the symbols we have in the slot machine
   ITEMS = ["joker", "star", "bell", "seven", "cherry"]
 
-  # Scores for getting three of the same symbol
-  # Using a hash gives us a clean and easier access  for the scores
+  # Using a hash to store the scores for three of a kind
   THREE_OF_A_KIND = {
     "joker" => 50,
     "star" => 40,
@@ -19,74 +18,88 @@ class SlotMachine
     "cherry" => 10
   }
 
-  # Scores for getting two of the same symbol plus a joker
-  TWO_AND_JOKER = {
+  # Another hash for two of the same + joker
+  TWO_OF_A_KIND = {
     "star" => 20,
     "bell" => 15,
     "seven" => 10,
     "cherry" => 5
   }
 
-  # Constructor - sets up the initial state of the slot machine
+
   def initialize(reels = [])
-    # Store the reels in an instance variable
-    # If empty, they'll be populated when play is called
-    @reels = reels
+    # The ternary operator (?:) checks if reels is empty:
+		# If it is empty, it calls the play method to generate random reels.
+		# If it's not empty, it uses the provided reels.
+    @reels = reels.empty? ? play : reels
   end
 
-  # method to simulate playing the slot machine
-  def play
-    # clear the existing reels
-    @reels = []
-    # select 3 random new items
-    3.times do
-      @reels << ITEMS.sample
-    end
-
-    # Return the new reels so player can see what they got
-    return @reels
-  end
-
-  # Calculate the score based on the current reels
+  # Public method - the interface others will use
   def score
+    # Using smaller private methods for readability
+    # It uses the || (logical OR) operator in a clever way:
+		# It tries three_of_a_kind_score first.
+		# If that returns nil (no match), it tries two_jokers_score.
+		# If that returns nil, it tries two_plus_joker_score.
+		# If all return nil, it returns 0 (no win).
+    return three_of_a_kind_score || two_jokers_score || two_plus_joker_score || 0
+  end
 
-    # Count occurrences of each item using a hash
-    # Hash.new(0) creates a hash where new keys start with value 0
-    counts = Hash.new(0)
+  # Public method to "play" the slot machine by generating random reels
+  def play
+    # create a new array of 3 symbols, randomly selected them from ITEMS
+    @reels = Array.new(3) { ITEMS.sample }
+  end
 
-    # Count occurrences of each item using a hash
+  private
+  # This keyword marks the following methods as private.
+	# Private methods can only be called within the class, not from outside.
+
+  def item_counts
+    # This method counts how many of each symbol appear in the reels.
+		# Hash.new(0) creates a new hash with a default value of 0.
+		# It iterates through each item in @reels and increments its count.
+    counts = Hash.new(0) # counts = {"joker"=2, "start"= 1}
     @reels.each { |item| counts[item] += 1}
+    counts
+  end
 
-    # Check each scoring rule in order
-    # Rule 1: Three of the same item
-    @reels.each do |item|
-      # check if I have an item happening 3 times
-      if counts[item] == 3
-        # if it does we will get their value from the constant created earlier
-        return THREE_OF_A_KIND[item]
-      end
-    end
+  def three_of_a_kind_score
+    # Private method to check for RULE 1 three of a kind
+    # counts the times the symbols is in the @reel calling the method
+    counts = item_counts
+    # @reels.each do |item|
+    #   if counts[item] == 3
+    #     return THREE_OF_A_KIND[item]
+    #   end
+    # end
+    item = @reels.find { |item| counts[item] == 3}
+    item ? THREE_OF_A_KIND[item] : nil
+  end
 
-    # Rule 2: Two jokers + anything
-    # check if I have the key "joker" happening two times
-    if counts["joker"] == 2
-      return 25
-    end
+  def two_jokers_score
+    # RULE 2 two jokers + anything
+    counts = item_counts
+    # if counts["joker"] == 2
+    #   return 25
+    # end
+    counts["joker"] == 2 ? 25 : nil
+  end
 
-    # Rule 3: Two of the same + joker
-    # check first if I have a joker
+  def two_plus_joker_score
+    # RULE 3 2 Anything + joker
+    counts = item_counts
+    # check if I have a joker
+    # if counts["joker"] == 1
+    #   @reels.each do |item|
+    #     if item != "joker" && counts[item] == 2
+    #       return TWO_OF_A_KIND[item]
+    #     end
+    #   end
+    # end
     if counts["joker"] == 1
-      # goes over all the items in the reels
-      @reels.each do |item|
-        # if it finds one that it's different from the joker and happen two times
-        if item != "joker" && counts[item] == 2
-          # gets the value of the item from the constant created earlier
-          return TWO_AND_JOKER[item]
-        end
-      end
+      item = @reels.find { |item| item != "joker" && counts[item] == 2 }
+      item ? TWO_OF_A_KIND[item] : nil
     end
-
-    # if nothing of the earlier conditions happen then its the score 0
-    return 0
   end
 end
